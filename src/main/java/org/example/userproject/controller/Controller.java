@@ -17,6 +17,9 @@ public class Controller {
     @PostMapping
     public void singup(@RequestBody User user) {
 
+
+
+
     }
 
 
