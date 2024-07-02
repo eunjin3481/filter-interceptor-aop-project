@@ -1,4 +1,4 @@
-package org.example.userproject.vo;
+package org.example.project.vo;
 
 import lombok.Getter;
 import lombok.Setter;
