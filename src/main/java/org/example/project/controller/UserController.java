@@ -17,17 +17,22 @@ public class UserController {
     UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> singup(@RequestBody User user) {
-        System.out.print(user.toString());
+    public ResponseEntity<?> signup(@RequestBody User user) {
+        log.info("-----signup controller-----");
+        log.info("-----추가할 user: -----" + user.toString());
         userService.insert(user);
 //        return new ResponseEntity<>(userService.insert(user), HttpStatus.CREATED);
         return null;
     }
 
 
-    @GetMapping
-    public void read() {
-
-
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> read(@PathVariable String userId) {
+        User user = userService.read(userId);
+        if (user != null) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

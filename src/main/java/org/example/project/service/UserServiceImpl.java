@@ -13,11 +13,12 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User insert(User newUser) {
-        return userMapper.insert(newUser);
+        userMapper.insert(newUser);
+        return userMapper.read(newUser.getId());
     }
 
     @Override
-    public User read(User user) {
-        return null;
+    public User read(String userId) {
+        return userMapper.read(userId);
     }
 }

@@ -8,9 +8,9 @@
         VALUES (#{id}, #{pw}, #{name})
     </insert>
 
-    <select id="read" parameterType="User" resultType="User">
-        SELECT id, name
+    <select id="read" parameterType="String" resultType="User">
+        SELECT id, pw, name
         FROM user
-        WHERE id = #{id}, and pw = #{pw}
+        WHERE id = #{id}
     </select>
 </mapper>

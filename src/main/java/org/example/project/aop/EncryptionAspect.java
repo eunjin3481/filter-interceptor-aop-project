@@ -2,39 +2,26 @@ package org.example.project.aop;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.example.project.util.AESUtil;
 import org.example.project.vo.User;
 import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+
+import static org.example.project.util.AESUtil.decodeKey;
 
 @Aspect
 @Component
 public class EncryptionAspect {
 
-    @Pointcut("execution(* org.example.project.service.UserService.getUser*(..))")
-    public void getUserMethod() {}
-
-    @Before("getUserMethod()")
-    public void beforeGetUser() {
-        System.out.println("Before retrieving user...");
-    }
-
-    @AfterReturning(pointcut = "getUserMethod()", returning = "user")
-    public void afterReturningGetUser(User user) {
+    @AfterReturning(pointcut = "execution(* com.example.project.service.UserService.read())", returning = "a")
+    public void encryptAllUsers(User user) throws Exception {
         if (user != null) {
-            // 사용자 정보 암호화
-            encryptUserData(user);
+            SecretKey key = decodeKey("aaaaaaaaaaaaaaaaaaaaaaaaassaaaaa");
+            String a = AESUtil.encrypt(user.toString(), key);
         }
     }
 
-    private void encryptUserData(User user) {
-        // 사용자 정보 암호화 로직
-//        user.setName(encrypt(user.getName()));
-    }
 
-    private String encrypt(String data) {
-        // 실제 암호화 로직
-        return data; // 예시로 단순 반환
-    }
 }
 
