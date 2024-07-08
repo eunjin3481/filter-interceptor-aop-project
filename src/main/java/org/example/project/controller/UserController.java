@@ -18,8 +18,12 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> singup(@RequestBody User user) {
-        return new ResponseEntity<>(userService.insert(user), HttpStatus.CREATED);
+        System.out.print(user.toString());
+        userService.insert(user);
+//        return new ResponseEntity<>(userService.insert(user), HttpStatus.CREATED);
+        return null;
     }
+
 
     @GetMapping
     public void read() {
