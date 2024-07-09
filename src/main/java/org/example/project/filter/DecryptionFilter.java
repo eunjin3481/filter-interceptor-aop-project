@@ -5,7 +5,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.example.project.util.AESUtil;
 import org.example.project.util.RereadableRequestWrapper;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpMethod;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.crypto.SecretKey;
@@ -14,11 +17,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Slf4j
+@Component
 public class DecryptionFilter implements Filter {
 
-    private String secretKey = "aaaaaaaaaaaaaaaaaaaaaaaaassaaaaa";
+    @Value("${secret.key}")
+    private String secretKey;
     private SecretKey key = null;
 
+    /**
+     *
+     * @param request
+     * @param response
+     * @param chain
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         log.info("-----doFilter start-----");
@@ -30,7 +43,7 @@ public class DecryptionFilter implements Filter {
         if (HttpMethod.GET.name().equalsIgnoreCase(httpRequest.getMethod())) { // GET 요청의 경우
             // 암호화된 사용자 ID 읽기
             String requestURI = httpRequest.getRequestURI();
-            String userId = requestURI.substring(6); // todo - split("user/")
+            String userId = requestURI.split("user/")[1];
             log.info("암호화된 사용자 ID: " + userId);
             // 사용자 ID 복호화
             String decryptedUserId = null;
@@ -42,6 +55,8 @@ public class DecryptionFilter implements Filter {
                 throw new RuntimeException(e);
 
             }
+
+            // todo-chain.doFilter 사용하기
             String modifiedRequestURI = requestURI.replace(userId, decryptedUserId);
             RequestDispatcher requestDispatcher = request.getRequestDispatcher(modifiedRequestURI);
             requestDispatcher.forward(request, response);
@@ -73,6 +88,7 @@ public class DecryptionFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig){
         // 초기화 코드
+        System.out.println("se"+ secretKey);
         key = AESUtil.decodeKey(secretKey);
     }
 

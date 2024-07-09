@@ -60,7 +60,7 @@ public class UserController {
         Object user = userService.read(userId);
         if (user != null) {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ApiResponse(ResponseCode.SUCCESS, user.toString()));
+                    .body(user);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(ResponseCode.USER_NOT_FOUND));
