@@ -1,8 +1,11 @@
 {
     "id":"ejshin",
-    "pw":1234,
+    "pw":"1234",
     "name":"eunjin"
 }
 
-lQQ+/ytU55QgdBOPcpWPrhpso1fdNqZbb9MzZZuOyATKf61UyGhVgzYE2toHUf+/R0jRVjbUSMNtdtjb9rGrXg==
+// 사용자 정보 암호화
+lLvs+p9k+o9ymgQqye6gQUno88GT7aeDuBEnGtQFhSR47m5wznaNEjR+PlC8+ERE
 
+// 사용자 ID 암호화
+WuHt/jXxzvxbEK9eguHX1w==

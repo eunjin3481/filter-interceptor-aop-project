@@ -7,3 +7,4 @@ create table user (
     admin boolean default false
 )
 
+todo-postconstruct랑 initializedbean 차이 공부해오기

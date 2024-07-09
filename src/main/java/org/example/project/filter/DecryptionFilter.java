@@ -2,20 +2,22 @@ package org.example.project.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.example.project.util.AESUtil;
 import org.example.project.util.RereadableRequestWrapper;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.servlet.HandlerMapping;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @Slf4j
 public class DecryptionFilter implements Filter {
 
-//    @Value("${secret.key}")
     private String secretKey = "aaaaaaaaaaaaaaaaaaaaaaaaassaaaaa";
+    private SecretKey key = null;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -25,37 +27,32 @@ public class DecryptionFilter implements Filter {
 
         // HttpServletRequest 감싸기
         RereadableRequestWrapper rereadableRequestWrapper = new RereadableRequestWrapper(httpRequest);
-
-        // GET 요청의 경우
-        String pathInfo = httpRequest.getPathInfo();
-        System.out.println(pathInfo);
-        if (pathInfo != null) {
-            log.info("변수화된 경로: " + pathInfo);
-
-            // 복호화 로직 추가
+        if (HttpMethod.GET.name().equalsIgnoreCase(httpRequest.getMethod())) { // GET 요청의 경우
+            // 암호화된 사용자 ID 읽기
+            String requestURI = httpRequest.getRequestURI();
+            String userId = requestURI.substring(6); // todo - split("user/")
+            log.info("암호화된 사용자 ID: " + userId);
+            // 사용자 ID 복호화
+            String decryptedUserId = null;
             try {
-                SecretKey key = AESUtil.decodeKey(secretKey);
-                String decryptedPath = AESUtil.decrypt(pathInfo.substring(1), key);
+                decryptedUserId = AESUtil.decrypt(userId, key);
+                log.info("복호화된 사용자 ID: " + decryptedUserId);
 
-                log.info("복호화된 경로: " + decryptedPath);
-
-                // 복호화된 경로로 새 경로 구성
-                String newUrl = httpRequest.getContextPath() + "/" + decryptedPath;
-
-                return;
             } catch (Exception e) {
-                throw new RuntimeException("Failed to decrypt path", e);
-            }
-        }
+                throw new RuntimeException(e);
 
-        // POST 요청의 경우
-        if (request instanceof HttpServletRequest && "POST".equalsIgnoreCase(httpRequest.getMethod())) {
+            }
+            String modifiedRequestURI = requestURI.replace(userId, decryptedUserId);
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher(modifiedRequestURI);
+            requestDispatcher.forward(request, response);
+            return;
+
+        }
+        if ("POST".equalsIgnoreCase(httpRequest.getMethod())) { // POST 요청의 경우
             // 암호화된 RequestBody 읽기
             String encryptedRequestBody = new String(rereadableRequestWrapper.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             log.info("암호화된 RequestBody: " + encryptedRequestBody);
-
             try {
-                SecretKey key = AESUtil.decodeKey(secretKey);
                 String decryptedRequestBody = AESUtil.decrypt(encryptedRequestBody, key);
                 log.info("복호화된 RequestBody: " + decryptedRequestBody);
 
@@ -63,19 +60,20 @@ public class DecryptionFilter implements Filter {
                 rereadableRequestWrapper.updateRawData(decryptedRequestBody.getBytes(StandardCharsets.UTF_8));
 
             } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
+                throw new RuntimeException(e); // todo-예외처리
 
-        // 필터 체인에 새로 만든 요청 전달
-        chain.doFilter(rereadableRequestWrapper, response);
+            }
+            // 필터 체인에 새로 만든 요청 전달
+            chain.doFilter(rereadableRequestWrapper, response);
+        }
 
         log.info("-----doFilter end-----");
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig){
         // 초기화 코드
+        key = AESUtil.decodeKey(secretKey);
     }
 
     @Override

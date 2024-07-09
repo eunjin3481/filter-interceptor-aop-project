@@ -7,8 +7,9 @@ import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
 public class AESUtil {
+    // todo-key 변수 선언, encrypt때 key를 안받아도됨
 
-    private static final String ALGORITHM = "AES";
+    private static final String ALGORITHM = "AES"; //AES-256
 
     // 키를 생성하는 메서드
     public static SecretKey generateKey() throws Exception {

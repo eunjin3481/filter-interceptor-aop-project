@@ -5,6 +5,7 @@ import org.example.project.vo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 @Service
 public class UserServiceImpl implements UserService{
 
@@ -12,13 +13,13 @@ public class UserServiceImpl implements UserService{
     UserMapper userMapper;
 
     @Override
-    public User insert(User newUser) {
+    public User insert(User newUser) throws Exception {
         userMapper.insert(newUser);
         return userMapper.read(newUser.getId());
     }
 
     @Override
-    public User read(String userId) {
+    public User read(String userId) throws Exception {
         return userMapper.read(userId);
     }
 }
