@@ -10,7 +10,7 @@ public enum ResponseCode {
     VALIDATION_FAILURE(3, "유효성 검사 실패"),
     SERVER_ERROR(4, "서버 오류"),
     USER_NOT_FOUND(5, "사용자 없음"),
-    INVALID_REQUEST(6, "잘못된 요청"),
+    BAD_REQUEST(6, "잘못된 요청"),
     AUTHENTICATION_FAILURE(7, "인증 실패");
 
     private final int code;

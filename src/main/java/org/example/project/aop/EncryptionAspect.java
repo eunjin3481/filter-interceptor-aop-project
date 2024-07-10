@@ -2,14 +2,9 @@ package org.example.project.aop;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
 import org.example.project.util.AESUtil;
 import org.example.project.util.ApiResponse;
 import org.example.project.util.ResponseCode;
-import org.example.project.vo.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
@@ -24,39 +19,63 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import javax.crypto.SecretKey;
 
-
 import static org.example.project.util.AESUtil.decodeKey;
 
+/**
+ * Controller에서 반환되는 응답 데이터를 암호화하는 Aspect
+ */
 @Slf4j
 @RestControllerAdvice
 public class EncryptionAspect implements ResponseBodyAdvice<Object> {
-    @Value("${secret.key}")
-    private String privateKey;
 
+    @Value("${secret.key}")
+    private String privateKey;  // application.properties에서 설정한 암호화 키
+
+    /**
+     * 특정 클래스의 반환값에 대해서만 이 Aspect가 동작하도록 설정
+     * ResponseEntity를 반환하는 경우에는 처리하지 않음
+     *
+     * @param returnType    메소드의 반환 타입
+     * @param converterType 메시지 컨버터의 타입
+     * @return              처리 여부 (true: 처리, false: 미처리)
+     */
     @Override
-    public boolean supports(org.springframework.core.MethodParameter returnType,
-                            Class converterType) {
-        // 모든 클래스에 대해 처리하도록 설정
-        return true;
+    public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+        return !returnType.getParameterType().equals(ResponseEntity.class);
     }
 
+    /**
+     * Controller의 메소드가 반환하는 데이터를 암호화하는 메소드
+     *
+     * @param body                    Controller에서 반환된 객체
+     * @param returnType              메소드의 반환 타입
+     * @param selectedContentType     선택된 컨텐츠 타입
+     * @param selectedConverterType   선택된 컨버터 타입
+     * @param request                 HTTP 요청 객체
+     * @param response                HTTP 응답 객체
+     * @return                        암호화된 응답 데이터
+     */
     @Override
-    public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+    public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
+                                  Class<? extends HttpMessageConverter<?>> selectedConverterType,
+                                  ServerHttpRequest request, ServerHttpResponse response) {
+        log.info("-----Advice Encryption-----");
 
-        System.out.println(body);
+        // 객체를 JSON 문자열로 변환
         Gson gson = new Gson();
         String json = gson.toJson(body);
 
-        log.info("json: {}", json);
-
+        // 설정된 암호화 키를 사용하여 데이터를 암호화
         SecretKey key = decodeKey(privateKey);
-        String encryptedUser = null;
+        String encryptedData = null;
         try {
-            encryptedUser = AESUtil.encrypt(json, key);
+            encryptedData = AESUtil.encrypt(json, key);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Encryption failed", e);
         }
-        log.info("암호화된 사용자 정보:" + encryptedUser);
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(ResponseCode.SUCCESS, encryptedUser));
+
+        // 암호화된 데이터를 ApiResponse 형태로 반환
+        log.info("[Advice] Encrypted data: " + encryptedData);
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(ResponseCode.SUCCESS, encryptedData));
     }
 }
