@@ -21,6 +21,7 @@ public class ApiResponse {
     public ApiResponse(ResponseCode responseCode) {
         this.code = responseCode.getCode();
         this.message = responseCode.getMessage();
+        this.data = null;
     }
 
     public void setResponseCode(ResponseCode responseCode) {

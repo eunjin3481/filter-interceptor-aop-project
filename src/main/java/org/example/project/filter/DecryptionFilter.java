@@ -21,8 +21,7 @@ import java.util.Map;
 public class DecryptionFilter implements Filter {
 
     @Value("${secret.key}")
-    private String secretKey;
-    private SecretKey key = null;
+    private String privateKey;
 
     /**
      *
@@ -48,7 +47,8 @@ public class DecryptionFilter implements Filter {
             // 사용자 ID 복호화
             String decryptedUserId = null;
             try {
-                decryptedUserId = AESUtil.decrypt(userId, key);
+                SecretKey secretKey = AESUtil.decodeKey(privateKey);
+                decryptedUserId = AESUtil.decrypt(userId, secretKey);
                 log.info("복호화된 사용자 ID: " + decryptedUserId);
 
             } catch (Exception e) {
@@ -63,12 +63,13 @@ public class DecryptionFilter implements Filter {
             return;
 
         }
-        if ("POST".equalsIgnoreCase(httpRequest.getMethod())) { // POST 요청의 경우
+        if (HttpMethod.POST.name().equalsIgnoreCase(httpRequest.getMethod())) { // POST 요청의 경우
             // 암호화된 RequestBody 읽기
             String encryptedRequestBody = new String(rereadableRequestWrapper.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             log.info("암호화된 RequestBody: " + encryptedRequestBody);
             try {
-                String decryptedRequestBody = AESUtil.decrypt(encryptedRequestBody, key);
+                SecretKey secretKey = AESUtil.decodeKey(privateKey);
+                String decryptedRequestBody = AESUtil.decrypt(encryptedRequestBody, secretKey);
                 log.info("복호화된 RequestBody: " + decryptedRequestBody);
 
                 // 새로 복호화된 RequestBody 설정
@@ -88,8 +89,6 @@ public class DecryptionFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig){
         // 초기화 코드
-        System.out.println("se"+ secretKey);
-        key = AESUtil.decodeKey(secretKey);
     }
 
     @Override

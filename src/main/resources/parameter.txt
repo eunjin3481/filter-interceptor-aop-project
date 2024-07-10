@@ -5,7 +5,11 @@
 }
 
 // 사용자 정보 암호화
-lLvs+p9k+o9ymgQqye6gQUno88GT7aeDuBEnGtQFhSR47m5wznaNEjR+PlC8+ERE
+Buk54Kwx+W20FJ+UNCC9affYTn2TNM8+e7b0DslwJzt0dPoJ4pwxP/feDOD2t5VpjSJ8cJ4mpWnF6vhcDEliEA==
 
-// 사용자 ID 암호화
-WuHt/jXxzvxbEK9eguHX1w==
+// 사용자 ID (ejshin) 암호화
+tiIGg2SSAjO/tzTUBAuWnQ==
+
+// 사용자 ID (sbcho) 암호화
+zXQrXIsetCBTaxgFb0L/Uw==
+

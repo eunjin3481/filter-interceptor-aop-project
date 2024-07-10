@@ -7,7 +7,10 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.example.project.util.AESUtil;
+import org.example.project.util.ApiResponse;
+import org.example.project.util.ResponseCode;
 import org.example.project.vo.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,6 +30,8 @@ import static org.example.project.util.AESUtil.decodeKey;
 @Slf4j
 @RestControllerAdvice
 public class EncryptionAspect implements ResponseBodyAdvice<Object> {
+    @Value("${secret.key}")
+    private String privateKey;
 
     @Override
     public boolean supports(org.springframework.core.MethodParameter returnType,
@@ -38,19 +43,20 @@ public class EncryptionAspect implements ResponseBodyAdvice<Object> {
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
 
+        System.out.println(body);
         Gson gson = new Gson();
         String json = gson.toJson(body);
 
         log.info("json: {}", json);
 
+        SecretKey key = decodeKey(privateKey);
+        String encryptedUser = null;
         try {
-            SecretKey key = decodeKey("aaaaaaaaaaaaaaaaaaaaaaaaassaaaaa");
-            String encryptedUser = AESUtil.encrypt(json, key);
-            log.info("암호화된 사용자 정보:" + encryptedUser);
-            return new ResponseEntity<>(encryptedUser, HttpStatus.OK);
-
+            encryptedUser = AESUtil.encrypt(json, key);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to encrypt response body", e);
+            throw new RuntimeException(e);
         }
+        log.info("암호화된 사용자 정보:" + encryptedUser);
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(ResponseCode.SUCCESS, encryptedUser));
     }
 }
