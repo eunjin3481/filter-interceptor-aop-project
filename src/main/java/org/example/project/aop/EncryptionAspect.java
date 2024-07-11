@@ -4,16 +4,17 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.example.project.util.AESUtil;
 import org.example.project.util.ApiResponse;
-import org.example.project.util.ResponseCode;
+import org.example.project.vo.EnumResponseCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
@@ -25,7 +26,8 @@ import static org.example.project.util.AESUtil.decodeKey;
  * Controller에서 반환되는 응답 데이터를 암호화하는 Aspect
  */
 @Slf4j
-@RestControllerAdvice
+@Order(2)
+@RestControllerAdvice(annotations = RestController.class)
 public class EncryptionAspect implements ResponseBodyAdvice<Object> {
 
     @Value("${secret.key}")
@@ -41,7 +43,7 @@ public class EncryptionAspect implements ResponseBodyAdvice<Object> {
      */
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        return !returnType.getParameterType().equals(ResponseEntity.class);
+        return true;
     }
 
     /**
@@ -60,10 +62,14 @@ public class EncryptionAspect implements ResponseBodyAdvice<Object> {
                                   Class<? extends HttpMessageConverter<?>> selectedConverterType,
                                   ServerHttpRequest request, ServerHttpResponse response) {
         log.info("-----Advice Encryption-----");
+        System.out.println(body.toString());
+        System.out.println(response);
+
 
         // 객체를 JSON 문자열로 변환
         Gson gson = new Gson();
         String json = gson.toJson(body);
+        log.info("[Advice] 암호화 전 사용자 정보: " + json);
 
         // 설정된 암호화 키를 사용하여 데이터를 암호화
         SecretKey key = decodeKey(privateKey);
@@ -71,11 +77,11 @@ public class EncryptionAspect implements ResponseBodyAdvice<Object> {
         try {
             encryptedData = AESUtil.encrypt(json, key);
         } catch (Exception e) {
-            throw new RuntimeException("Encryption failed", e);
+            throw new RuntimeException(e);
         }
 
         // 암호화된 데이터를 ApiResponse 형태로 반환
-        log.info("[Advice] Encrypted data: " + encryptedData);
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(ResponseCode.SUCCESS, encryptedData));
+        log.info("[Advice] 암호화 후 사용자 정보: " + encryptedData);
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(EnumResponseCode.SUCCESS, encryptedData));
     }
 }

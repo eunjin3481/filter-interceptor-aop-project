@@ -4,13 +4,26 @@
 <mapper namespace="org.example.project.mapper.UserMapper">
 
     <insert id="insert" parameterType="User">
-        INSERT INTO user (id, pw, name)
-        VALUES (#{id}, #{pw}, #{name})
+        INSERT INTO user (
+            id
+            , pw
+            , name
+        )
+        VALUES (
+            #{id}
+            , #{pw}
+            , #{name}
+        )
     </insert>
 
     <select id="read" parameterType="String" resultType="User">
-        SELECT id, pw, name
-        FROM user
-        WHERE id = #{id}
+        SELECT
+            id
+            , pw
+            , name
+        FROM
+            user
+        WHERE
+            id = #{id}
     </select>
 </mapper>

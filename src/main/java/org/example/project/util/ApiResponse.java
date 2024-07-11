@@ -1,10 +1,10 @@
 package org.example.project.util;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.project.vo.EnumResponseCode;
 
-@NoArgsConstructor
+//@NoArgsConstructor
 @Getter
 @Setter
 public class ApiResponse {
@@ -12,20 +12,16 @@ public class ApiResponse {
     private String message;
     private String data;
 
-    public ApiResponse(ResponseCode responseCode, String data) {
+    public ApiResponse(EnumResponseCode responseCode, String data) {
         this.code = responseCode.getCode();
         this.message = responseCode.getMessage();
         this.data = data;
     }
 
-    public ApiResponse(ResponseCode responseCode) {
+    public ApiResponse(EnumResponseCode responseCode) {
         this.code = responseCode.getCode();
         this.message = responseCode.getMessage();
         this.data = null;
     }
 
-    public void setResponseCode(ResponseCode responseCode) {
-        this.code = responseCode.getCode();
-        this.message = responseCode.getMessage();
-    }
 }

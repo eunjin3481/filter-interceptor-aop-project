@@ -3,10 +3,12 @@ package org.example.project;
 import org.example.project.util.AESUtil;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 
 import javax.crypto.SecretKey;
 
 @SpringBootApplication
+@ServletComponentScan
 public class ProjectApplication {
 
 	public static void main(String[] args) {

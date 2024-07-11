@@ -1,9 +1,9 @@
-package org.example.project.util;
+package org.example.project.vo;
 
 import lombok.Getter;
 
 @Getter
-public enum ResponseCode {
+public enum EnumResponseCode {
     SUCCESS(0, "성공"),
     MISSING_REQUIRED_FIELDS(1, "필수 필드 누락"),
     DUPLICATE_ID(2, "ID 중복"),
@@ -16,7 +16,7 @@ public enum ResponseCode {
     private final int code;
     private final String message;
 
-    ResponseCode(int code, String message) {
+    EnumResponseCode(int code, String message) {
         this.code = code;
         this.message = message;
     }

@@ -1,25 +1,24 @@
 package org.example.project.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.javassist.NotFoundException;
 import org.example.project.service.UserService;
-import org.example.project.util.ApiResponse;
 import org.example.project.vo.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * FIXME 주석
+ */
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/user")
 public class UserController {
-
-    UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    // todo - 생성자 주입 애노테이션 찾아보기
+    private final UserService userService;
 
     /**
      * 사용자 추가 요청을 처리하는 메소드
@@ -32,6 +31,7 @@ public class UserController {
         log.info("-----controller signup()-----");
         User user = userService.insert(newUser);
         return user;
+
     }
 
     /**
@@ -41,15 +41,16 @@ public class UserController {
      * @throws Exception 예외 발생 시
      */
     @GetMapping("/{userId}")
-    public User readUser(@PathVariable String userId) throws Exception {
+    public ResponseEntity<?> readUser(@PathVariable String userId) throws Exception {
         log.info("-----controller readUser()-----");
         User user = userService.read(userId);
 
         // 사용자가 존재하지 않을 경우 NotFoundException을 발생
         if (user == null) {
-            throw new NotFoundException("User not found for userId: " + userId);
-        }
+            throw new NotFoundException("User Not Found Exception");
 
-        return user;
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(user);
+
     }
 }
