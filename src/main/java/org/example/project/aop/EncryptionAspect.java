@@ -73,7 +73,7 @@ public class EncryptionAspect implements ResponseBodyAdvice<Object> {
             encryptedData = AESUtil.encrypt(json, key);
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to encrypt response data");
 
         }
         // 암호화된 데이터를 ApiResponse 형태로 반환

@@ -45,9 +45,8 @@ public class DecryptionFilter implements Filter {
             String requestURI = httpRequest.getRequestURI();
             String[] parts = requestURI.split("user/");
             // URI 형식이 잘못된 경우 BadRequestException 발생
-            //todo 예외처리 확인해보기
             if (parts.length < 2) {
-                throw new BadRequestException("Bad Request Exception");
+                throw new BadRequestException("parameter is empty");
 
             }
             String userId = parts[1];
@@ -59,7 +58,7 @@ public class DecryptionFilter implements Filter {
                 decryptedUserId = AESUtil.decrypt(userId, secretKey);
 
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to decrypt request data");
 
             }
             log.info("[Filter] 복호화 후 사용자 ID: " + decryptedUserId);
@@ -74,7 +73,7 @@ public class DecryptionFilter implements Filter {
 
             // 요청 body가 비어 있는 경우 BadRequestException 발생
             if (encryptedBytes.length == 0) {
-                throw new BadRequestException("Bad Request Exception");
+                throw new BadRequestException("body data is empty");
             }
 
             String encryptedRequestBody = new String(encryptedBytes, StandardCharsets.UTF_8);
@@ -86,7 +85,7 @@ public class DecryptionFilter implements Filter {
             try {
                 decryptedRequestBody = AESUtil.decrypt(encryptedRequestBody, secretKey);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to decrypt request data");
             }
             log.info("[Filter] 복호화 후 사용자 정보: " + decryptedRequestBody);
 

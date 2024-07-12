@@ -5,7 +5,6 @@ import org.apache.coyote.BadRequestException;
 import org.apache.ibatis.javassist.NotFoundException;
 import org.example.project.util.ApiResponse;
 import org.example.project.vo.EnumResponseCode;
-import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,8 +39,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<?> handleBadRequestException(BadRequestException ex) {
-        // todo - error message 정확하게 작성하기
-        log.info("BadRequestException", ex);
+        log.info("{}",ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(EnumResponseCode.BAD_REQUEST));
 
     }
@@ -53,7 +51,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        log.error("DataIntegrityViolationException", ex);
+        log.error("User ID duplicated", ex);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse(EnumResponseCode.DUPLICATE_ID));
 
     }
@@ -65,7 +63,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleServerErrorException(Exception ex) {
-        log.info("Exception", ex);
+        log.info("{}",ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(EnumResponseCode.SERVER_ERROR));
 
     }
