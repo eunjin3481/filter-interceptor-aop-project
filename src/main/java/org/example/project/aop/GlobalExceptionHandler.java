@@ -13,10 +13,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * FIXME 클래스 주석
+ * 예외처리 하는 Aspect
+ * @Order(1): RestControllerAdvice의 순서를 첫 번째로 지정
  */
 @Slf4j
-@Order(1)
+//@Order(1)
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -29,6 +30,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleNotFoundException(NotFoundException ex) {
         log.info("Failed to find user.", ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(EnumResponseCode.USER_NOT_FOUND));
+
     }
 
     /**
@@ -38,31 +40,11 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<?> handleBadRequestException(BadRequestException ex) {
-        log.info("-----{}-----", ex.getMessage());
+        // todo - error message 정확하게 작성하기
+        log.info("BadRequestException", ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(EnumResponseCode.BAD_REQUEST));
-    }
 
-//    /**
-//     * ServerErrorException 예외 처리 메소드
-//     * @param ex 발생한 ServerErrorException 객체
-//     * @return HTTP 500 상태 코드와 함께 서버 오류를 나타내는 ApiResponse를 반환
-//     */
-//    @ExceptionHandler(ServerErrorException.class)
-//    public ResponseEntity<?> handleServerErrorException(ServerErrorException ex) {
-//        log.info("-----{}-----", ex.getMessage());
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(ResponseCode.SERVER_ERROR));
-//    }
-//
-//    /**
-//     * RuntimeException 예외 처리 메소드
-//     * @param ex 발생한 RuntimeException 객체
-//     * @return HTTP 500 상태 코드와 함께 서버 오류를 나타내는 ApiResponse를 반환
-//     */
-//    @ExceptionHandler(RuntimeException.class)
-//    public ResponseEntity<?> handleServerErrorException(RuntimeException ex) {
-//        log.info("-----{}-----", ex.getMessage());
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(ResponseCode.SERVER_ERROR));
-//    }
+    }
 
     /**
      * DataIntegrityViolationException 예외 처리 메소드
@@ -71,8 +53,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        log.error("-----{}-----", ex.getMessage());
+        log.error("DataIntegrityViolationException", ex);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse(EnumResponseCode.DUPLICATE_ID));
+
     }
 
     /**
@@ -82,7 +65,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleServerErrorException(Exception ex) {
-        log.info("-----{}-----", ex.getMessage());
+        log.info("Exception", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(EnumResponseCode.SERVER_ERROR));
+
     }
 }

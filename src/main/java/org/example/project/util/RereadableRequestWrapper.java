@@ -28,20 +28,21 @@ public class RereadableRequestWrapper extends HttpServletRequestWrapper {
      */
     public RereadableRequestWrapper(HttpServletRequest request) throws IOException {
         super(request);
-
         // 문자 인코딩 설정
         String characterEncoding = request.getCharacterEncoding();
         if (StringUtils.isBlank(characterEncoding)) {
             characterEncoding = StandardCharsets.UTF_8.name();
+
         }
         this.encoding = Charset.forName(characterEncoding);
-
         // 원본 요청의 InputStream에서 데이터를 읽어 byte 배열로 저장
         try {
             InputStream inputStream = request.getInputStream();
             this.rawData = IOUtils.toByteArray(inputStream);
+
         } catch (IOException e) {
             throw e;
+
         }
     }
 
@@ -75,13 +76,12 @@ public class RereadableRequestWrapper extends HttpServletRequestWrapper {
             }
 
             @Override
-            public void setReadListener(ReadListener readListener) {
-
-            }
+            public void setReadListener(ReadListener readListener) {}
 
             @Override
             public int read() throws IOException {
                 return byteArrayInputStream.read();
+
             }
         };
         return servletInputStream;

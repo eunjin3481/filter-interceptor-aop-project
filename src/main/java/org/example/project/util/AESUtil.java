@@ -23,6 +23,7 @@ public class AESUtil {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(ALGORITHM);
         keyGenerator.init(256); // 키 크기 설정 (256비트)
         return keyGenerator.generateKey();
+
     }
 
     /**
@@ -44,6 +45,7 @@ public class AESUtil {
     public static SecretKey decodeKey(String encodedKey) {
         byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
         return new SecretKeySpec(decodedKey, 0, decodedKey.length, ALGORITHM);
+
     }
 
     /**

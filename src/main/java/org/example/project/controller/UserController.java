@@ -4,53 +4,54 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.javassist.NotFoundException;
 import org.example.project.service.UserService;
+import org.example.project.util.ApiResponse;
+import org.example.project.vo.EnumResponseCode;
 import org.example.project.vo.User;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * FIXME 주석
+ * 사용자 관련 API 엔드포인트를 제공하는 컨트롤러
  */
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    // todo - 생성자 주입 애노테이션 찾아보기
-    private final UserService userService;
+
+    private final UserService userService; // UserService 주입
 
     /**
-     * 사용자 추가 요청을 처리하는 메소드
-     * @param newUser 등록할 사용자 정보
-     * @return 등록된 사용자 정보
-     * @throws Exception 예외 발생 시
+     * 사용자 추가 요청을 처리하는 메서드
+     *
+     * @param newUser 등록할 사용자 정보를 담은 User 객체
+     * @return ApiResponse 객체로 감싼 등록된 사용자 정보
+     * @throws Exception 등록 과정에서 예외가 발생할 경우
      */
     @PostMapping
-    public User signup(@RequestBody User newUser) throws Exception {
+    public ApiResponse signup(@RequestBody User newUser) throws Exception {
         log.info("-----controller signup()-----");
-        User user = userService.insert(newUser);
-        return user;
+        User user = userService.insert(newUser); // UserService를 통해 사용자 등록
+        return new ApiResponse(EnumResponseCode.SUCCESS, user); // ApiResponse를 생성하여 반환
 
     }
 
     /**
-     * 사용자 조회 요청을 처리하는 메소드
+     * 사용자 조회 요청을 처리하는 메서드
+     *
      * @param userId 조회할 사용자의 아이디
-     * @return 조회된 사용자 정보
-     * @throws Exception 예외 발생 시
+     * @return ApiResponse 객체로 감싼 조회된 사용자 정보
+     * @throws Exception 조회 과정에서 예외가 발생할 경우
      */
     @GetMapping("/{userId}")
-    public ResponseEntity<?> readUser(@PathVariable String userId) throws Exception {
+    public ApiResponse readUser(@PathVariable String userId) throws Exception {
         log.info("-----controller readUser()-----");
-        User user = userService.read(userId);
-
-        // 사용자가 존재하지 않을 경우 NotFoundException을 발생
+        User user = userService.read(userId); // UserService를 통해 사용자 조회
+        // 사용자가 존재하지 않을 경우 NotFoundException 발생
         if (user == null) {
             throw new NotFoundException("User Not Found Exception");
 
         }
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+        return new ApiResponse(EnumResponseCode.SUCCESS, user); // ApiResponse를 생성하여 반환
 
     }
 }

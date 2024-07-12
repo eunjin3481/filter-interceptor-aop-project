@@ -8,23 +8,19 @@ import org.apache.coyote.BadRequestException;
 import org.example.project.util.AESUtil;
 import org.example.project.util.RereadableRequestWrapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * 요청을 복호화하는 필터
+ * 요청을 복호화하는 Filter
  */
 @Slf4j
 @WebFilter(urlPatterns = "/user/*")
 public class DecryptionFilter implements Filter {
 
-    // todo - @Configuration을 통해 filter 등록시 privateKey(=null)에 값이 주입이 안됨
     @Value("${secret.key}")
     private String privateKey;
 
@@ -42,7 +38,6 @@ public class DecryptionFilter implements Filter {
         log.info("-----doFilter start-----");
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        System.out.println(httpRequest.getRequestURI());
         RereadableRequestWrapper rereadableRequestWrapper = new RereadableRequestWrapper(httpRequest);
         String httpMethodStr = httpRequest.getMethod();
         // GET 요청일 경우 사용자 ID 복호화
